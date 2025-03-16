@@ -1,34 +1,48 @@
-
-#pragma once
 #include <string>
-#include "queryUsuari.hpp"
-class USUARI
+
+
+using namespace std;
+
+class Usuari
 {
 
 private:
-
-	//cambiar a struct
-	// ALGO algo;
-	std::string ID;
-	std::string Nom;
-	std::string cognom;
-	std::string email;
-	std::string contrasenya;
+	// considerar usar un struct, tal vez nos puede interesar para pasar los datos por parÃ©metro a la funciÃ³n de querySql...
 	/*
-	
-	Desde ForntEnd el usuario introduce datos.
-	Los datos son enviados a BackEnd, los recibimos y dichos datos son tratados en su respectivo metodo implementado
-	Tras terminar de tratar, se llama desde el mismo metodo, al archivo queryUsuari.hpp el cual tiene de rol
-	realizar llamadas a la BBDD
-	
-	
-	
+	struct usuari{
+		string idUsuari;
+		string nom;
+		string cognom;
+		string email;
+		string contrasenya;
+	}
 	*/
+
+	string idUsuari;
+	string nom;
+	string cognom;
+	string email;
+	string contrasenya;
+
+	/*
+
+		Desde ForntEnd el usuario introduce datos.
+		Los datos son enviados a BackEnd, los recibimos y dichos datos son tratados en su respectivo metodo implementado
+		Tras terminar de tratar, se llama desde el mismo metodo, al archivo queryUsuari.hpp el cual tiene de rol
+		realizar llamadas a la BBDD
+
+
+
+		*/
 public:
+	Usuari();
+	Usuari(string idUsuari, string nom, string cognom, string email, string contrasenya);
+
 	void registrarUsuari();
 	void iniciarSessio();
-	void consultarUsuari(); //añadir esta operación al modelo de clases (se me olvído añadirlo)
+	void consultarUsuari(string idUsuari); // aï¿½adir esta operaciï¿½n al modelo de clases (se me olvï¿½do aï¿½adirlo)
 	void modificarUsuari();
 	void eliminarUsuari();
 
+	// implementar getters y setters?
 };

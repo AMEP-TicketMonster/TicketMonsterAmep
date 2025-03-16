@@ -1,6 +1,6 @@
 #include "../include/usuari.hpp"
 
-void USUARI::iniciarSessio()
+void Usuari::iniciarSessio()
 {
 
 }

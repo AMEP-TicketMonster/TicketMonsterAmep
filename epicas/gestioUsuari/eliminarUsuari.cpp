@@ -1,6 +1,6 @@
 #include "../include/usuari.hpp"
 
-void USUARI::eliminarUsuari()
+void Usuari::eliminarUsuari()
 {
 
 }

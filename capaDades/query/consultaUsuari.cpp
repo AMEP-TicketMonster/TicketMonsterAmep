@@ -1,4 +1,4 @@
-#include "queryUsuari.hpp"
+#include "consultaUsuari.hpp"
 
 std::vector<std::vector<std::string>> queryUsuaris() {
     std::vector<std::vector<std::string>> resultados;

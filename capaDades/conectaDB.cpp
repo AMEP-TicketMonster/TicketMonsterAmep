@@ -3,6 +3,9 @@
 
 using namespace std;
 
+// dependencia: MySQL Connector -> paquete: libmysqlcppconn-dev
+
+
 string DB_HOST="127.0.0.1:3306";    //introducir manualmente el puerto (este es el mio por defecto, mirad donde teneis el mariadb)
 string DB_NAME = "";    //el nombre de la base de datos (nombre en mariadb)
 string DB_USERNAME="";  //usuario mariadb

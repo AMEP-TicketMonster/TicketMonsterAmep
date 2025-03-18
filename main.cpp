@@ -1,23 +1,15 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-
-
-// dependencia: MySQL Connector -> paquete: libmysqlcppconn-dev
-
-
-// el programa principal no debería instanciar la clase usuario. Solo debe de iniciar el programa y llamar a "la capa de presentación"
-// este código del main solo son pruebas y debe ser configurado futuramente en un archivo tests.cpp.
-#include "include/usuari.hpp"
+#include "capaPresentacio/capaPresentacio.hpp"
 
 using namespace std;
 int main()
 {
-
-    // TEST:
-
-    Usuari user1;
-    user1.consultarUsuari("AMEP2025");
+    CapaPresentacio &presentacio = CapaPresentacio::getInstance();
+    //aquí debería haber una pantalla inicial que diga que hacer (por ejemplo login o antes de eso, una página con información)
+    //test:
+    presentacio.viewConsultaUsuari();
 }
 
 /*

@@ -1,6 +1,5 @@
 // fer include dels controladors de la capa de domini
-#include "capaDomini/include/txConsultaUsuari.hpp";
-
+#include "../capaDomini/casosUsuari/include/txConsultaUsuari.hpp"
 
 class CapaPresentacio
 {
@@ -15,5 +14,16 @@ public:
     }
 
     void viewConsultaUsuari();
-    // void iniciaSessio(), ...registre...
-}
+
+    void viewTancaSessio();
+
+    void viewRegistraUsuari();
+
+    void viewIniciaSessio();
+
+    void viewModificaUsuari();
+
+	void viewEsborraUsuari();
+
+
+};

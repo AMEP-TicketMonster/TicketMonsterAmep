@@ -5,7 +5,6 @@ using namespace std;
 class UsuariDTO
 {
 private:
-
     string idUsuari;
     string nom;
     string cognom;
@@ -13,7 +12,11 @@ private:
     string contrasenya;
 
 public:
-//constructor
+    // constructor
+
+    UsuariDTO() = default; //parche
+    //si está vacio no devuelve nada la txConsultaUsuari
+
     UsuariDTO(string idUsuari, string nom, string cognom, string email, string contrasenya);
 
     // getters y setters del dtO

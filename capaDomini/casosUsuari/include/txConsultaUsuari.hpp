@@ -1,14 +1,17 @@
-
+#pragma once
 // #include "../include/usuari.hpp"
 // #include "../pasarelaDB/queryUsuari.hpp"
 #include <iostream>
 #include "../../dto/usuariDTO.hpp"
+#include "../../../app/ticketMonster.hpp"
+#include "../../../capaDades/query/consultaUsuari.hpp"
+#include "../../../capaDades/passarelaUsuari.hpp"
 // incluir pasarela
 class TxConsultaUsuari
 {
 private:
-    UsuariDTO usuari;
-    //GatewayUsuari pasarelaUsuari;
+    UsuariDTO resultat;
+    PassarelaUsuari usuari;
 
     /*
         breve introducción:
@@ -21,12 +24,11 @@ private:
         /importante: no podemos enviar un dto entero a la capa de presentación, hay que tratar los datos
     */
 public:
-    TxConsultaUsuari(){
-
-    };
+    TxConsultaUsuari();
 
     void executar();
 
-    UsuariDTO obteResultat();
+    UsuariDTO obteResultat() const;
     
-}
+    PassarelaUsuari obteUsuari() const;
+};

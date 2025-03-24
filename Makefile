@@ -1,42 +1,44 @@
-#Makefile provisional generado por chatGPT
-# Compilador y opciones
+# Compilador
 CXX = g++
-CXXFLAGS = -Wall -Wextra -std=c++11 -Iinclude -std=c++11
-LDFLAGS = -lmysqlcppconn
+CXXFLAGS = -std=c++11 -Wall
 
-# Archivos fuente con rutas explícitas
-SRC = main.cpp \
-      epicas/usuari.cpp \
-      epicas/gestioUsuari/consultarUsuari.cpp \
-      epicas/gestioUsuari/eliminarUsuari.cpp \
-      epicas/gestioUsuari/iniciarSessio.cpp \
-      epicas/gestioUsuari/modificarUsuari.cpp \
-      epicas/gestioUsuari/registrarUsuari.cpp \
-      pasarelaDB/conectaDB.cpp \
-      pasarelaDB/queryUsuari.cpp \
-      views/MainWindow.cpp
+# Librerías necesarias
+LIBS = -lmysqlcppconn
 
-# Archivos objeto generados a partir de los fuentes
-OBJ = $(SRC:.cpp=.o)
+# Directorios
+BUILD_DIR = build
+OBJ_DIR = $(BUILD_DIR)/obj
+BIN_DIR = $(BUILD_DIR)/bin
+
+# Archivos fuente necesarios
+SRCS = \
+    capaDades/conectaDB.cpp \
+    capaDades/passarelaUsuari.cpp \
+    capaDomini/casosUsuari/src/txConsultaUsuari.cpp \
+    capaDomini/dto/usuariDTO.cpp \
+    app/ticketMonster.cpp \
+    capaPresentacio/capaPresentacio.cpp \
+    main.cpp
+
+# Generar objetos en obj/ con la misma estructura de directorios
+OBJS = $(patsubst %.cpp, $(OBJ_DIR)/%.o, $(SRCS))
 
 # Nombre del ejecutable
-TARGET = programa
+TARGET = $(BIN_DIR)/ticketmonster
 
-# Regla principal: compilar el ejecutable
+# Regla principal
 all: $(TARGET)
 
-# Regla para compilar el ejecutable
-$(TARGET): $(OBJ)
-	$(CXX) $(CXXFLAGS) -o $(TARGET) $(OBJ) $(LDFLAGS)
+# Compilación del ejecutable
+$(TARGET): $(OBJS)
+	@mkdir -p $(BIN_DIR)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
-# Regla para compilar cada archivo .cpp en un .o
-%.o: %.cpp
+# Regla para compilar archivos .cpp a .o
+$(OBJ_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Regla para limpiar archivos compilados
+# Limpieza de archivos compilados
 clean:
-	rm -f $(OBJ) $(TARGET)
-
-# Regla para ejecutar el programa
-run: all
-	./$(TARGET)
+	rm -rf $(BUILD_DIR)

@@ -1,1 +1,0 @@
-en este directorio hay que guardar los .o y otros binarios de compilación

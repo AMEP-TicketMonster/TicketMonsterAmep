@@ -1,6 +1,6 @@
 .env
 .vscode
-
+.vs
 # Compiled binary files
 *.exe
 *.dll
@@ -28,8 +28,6 @@ obj/
 *.user
 *.ncb
 *.sdf
-*.sln*
-*.vcxproj*
 *.VC.db
 
 # Logs, temporary files

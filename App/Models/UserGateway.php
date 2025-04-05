@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use App\Config\Database;
 #require_once __DIR__ . "/../../config/config.php"; // config.php para usar db
 
@@ -18,9 +19,9 @@ class UserGateway
     }
 
     // Cargar un usuario x email
-    public function findByEmail($email)
+    public function getByEmail($email)
     {
-        
+
         $stmt = $this->pdo->prepare("SELECT * FROM Usuaris WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
@@ -30,10 +31,40 @@ class UserGateway
             $this->email = $user["email"];
             $this->password = $user["contrasenya"];
         }
-        //Esto que parece un poco raro es para devolver el usuario lo tenemos que coger con pinzas porque no es la forma más optima
         return $user;
-        
-        return true;
+    }
+
+    public function getByUserId($id)
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM Usuaris WHERE idUsuari = ?");
+        $stmt->execute([$id]);
+        $user = $stmt->fetch();
+
+        if ($user) {
+            $this->id = $user["idUsuari"];
+            $this->email = $user["email"];
+            $this->password = $user["contrasenya"];
+        }
+        return $user;
+    }
+
+    public function delete($id)
+    {
+        try {
+            $stmt = $this->pdo->prepare("DELETE FROM Usuaris WHERE idUsuari = ?");
+            $stmt->execute([$id]);
+
+            if ($stmt->rowCount() > 0) {
+                // Si se ha borrado una fila
+                return true;
+            } else {
+                return false;
+            }
+        } catch (\PDOException $e) {
+            //Habría que guardar el log con la clase errorLog
+            echo "Error: " . $e->getMessage();
+            return false;
+        }
     }
 
     // Verificar la contraseña

@@ -22,7 +22,9 @@ class Route
             'conciertos',
             'salas',
             'dashboard',
-            'logout'
+            'logout',
+            'profile',
+            'delete-user'
         ];
 
 
@@ -44,6 +46,7 @@ class Route
             'login'      => 'users/login.php',
             'register'   => 'users/register.php',
             'dashboard'  => 'users/dashboard.php',
+            'profile'    => 'users/perfil.php',
             'conciertos' => 'conciertos.php',
             'salas'      => 'salas.php'
         ];
@@ -62,21 +65,29 @@ class Route
             if ($requestUri == 'logout') {
                 $controller = new UserController();
                 $controller->logout();
-                exit();  
+                exit();
             }
         } else if ($requestMethod === 'POST') {
             if ($requestUri === 'login') {
-                // Llamamos al método login() del controlador UserController
                 $controller = new UserController();
                 $controller->login();
-                exit();  // Detenemos la ejecución después de manejar la solicitud
             }
 
             if ($requestUri === 'register') {
-                // Llamamos al método register() del controlador UserController
                 $controller = new UserController();
-                $controller->register(); // Asegúrate de tener el método en tu UserController
+                $controller->register();
                 exit();
+            }
+
+            if ($requestUri == 'delete-user') {
+                if (isset($_POST['idUsuari']) && !empty($_POST['idUsuari'])) {
+                    $id = $_POST['idUsuari'];
+                    $controller = new UserController();
+                    $controller->delete($id); 
+                } else {
+                    header("Location: /login");
+                    exit();
+                }
             }
         }
 

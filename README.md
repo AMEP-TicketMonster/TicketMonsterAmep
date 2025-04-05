@@ -19,6 +19,21 @@ Configurar
 Una vez instalado, en la carpeta del proyecto instalar composer:
 ```
 composer install
+composer init
+composer dump-autoload
+```
+(en el caso de que no funcione el autoload, revisar el composer.json, tiene que tener la siguiente información):
+```
+{
+    "name": "amep06/ticketmonster",
+    "autoload": {
+        "psr-4": {
+            "App\\": "App/"
+        }
+    },
+    "require": {}
+}
+
 ```
 
 

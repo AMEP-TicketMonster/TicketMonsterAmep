@@ -15,14 +15,12 @@ class UserController
     {
         $this->userGateway = new UserGateway();
         if (session_status() === PHP_SESSION_NONE) {
-            session_start();
             Session::sessionStart("ticketmonster_session");
         }
     }
 
     public function login()
     {
-
         $email = trim($_POST["email"]);
         $contrasenya = trim($_POST["password"]);
 
@@ -32,7 +30,7 @@ class UserController
         }
 
         // Obtener el usuario por email
-        $user = $this->userGateway->findByEmail($email);
+        $user = $this->userGateway->getByEmail($email);
 
         //var_dump($this->userGateway->verifyPassword($contrasenya, $user['contrasenya']), $contrasenya, $user['contrasenya']);
         //var_dump();
@@ -40,15 +38,13 @@ class UserController
 
         if ($user != NULL && $this->userGateway->verifyPassword($contrasenya, $user['contrasenya'])) {
             $_SESSION['status'] = true;
-            //CUIDADO que he pasado la contraseña al frontend!!! hay que tratar los datos! Con un DTO por ejemplo!
-            unset($user['contrasenya']);
+            unset($user['contrasenya']);                //CUIDADO que he pasado la contraseña al frontend!!! hay que tratar los datos! Con un DTO por ejemplo!
             $_SESSION['user'] = $user;   //luego hay que recoger y tratar los datos
             header("Location: /dashboard");
             //exit();
         } else {
-            echo "mail i contrasenya incorrecta";
-            //podríamos pasar algún dato para mostrar un mensaje de contraseña incorrecta
-            // header("Location: /login");
+            $_SESSION['bad_login_data'] = true;
+            header("Location: /login");
         }
     }
     public function register()
@@ -98,20 +94,6 @@ class UserController
     }
 
 
-    public function showUser($id)
-    {
-        //esta plantilla no debería interesarnos ya que seguramente lo haremos con javascript, pero para probar cosas la mantenemos
-        $user = $this->getUserById($id);
-
-        if ($user) {
-            echo "Usuario encontrado: <br>";
-            echo "ID: " . $user['id'] . "<br>";
-            echo "Nombre: " . $user['name'] . "<br>";
-            echo "Correo: " . $user['email'] . "<br>";
-        } else {
-            echo "Usuario no encontrado.";
-        }
-    }
 
     public function createUser($name, $email, $password)
     {
@@ -130,18 +112,15 @@ class UserController
     }
 
     // Eliminar un usuario por ID
-    public function deleteUser($id)
+    public function delete($id)
     {
-        // Aquí iría el código para eliminar al usuario desde la base de datos
-        // Vamos a simularlo para la demostración
-        $user = $this->getUserById($id);
-
+        //antes de hacer la eliminación habrá que revisar a cuantas tablas afecta i ver si se puede hacer o afectaría a la lógica del programa
+        $user = $this->userGateway->getByUserId($id);
         if ($user) {
-            // Simulamos la eliminación del usuario
-            echo "Usuario con ID $id eliminado exitosamente.";
-        } else {
-            echo "Usuario no encontrado.";
+            $this->userGateway->delete($id);
         }
+        //borrar la sesión para que no se pueda acceder a las rutas.
+        Session::closeSession();
     }
 
     // Función auxiliar para obtener un usuario por su ID (simulada con un array)

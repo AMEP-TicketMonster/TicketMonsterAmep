@@ -3,7 +3,7 @@
   https://mdbootstrap.com/docs/standard/extended/login/
 -->
 <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
-<form action="/login_input" method="POST">
+<form action="/login" method="POST">
   <!-- Email input -->
   <div data-mdb-input-init class="form-outline mb-4">
     <input type="email" name ="email" id="form2Example1" class="form-control" />

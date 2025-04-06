@@ -133,17 +133,26 @@ void Dades::afegeix_assaig(const Assaig& assaig) {
     }
 }
 
-// Post: aquesta funció retorna el ID del registre afegit a DataSala
+// 
+// Post: aquesta funció retorna el ID del registre afegit a DataSala. Si la entrada ja existeix no fa res
 int Dades::afegeix_dataSala(int idSala, const string& dia, const string& hora_inici, const string& hora_fi) {
     int ret = -1;
     try {
         string sql = "INSERT INTO DataSala(idSala, dia, hora_inici, hora_fi)"
             "Values(" + to_string(idSala) + ", '" + dia + "', '" + hora_inici + "', '" + hora_fi + "')";
-        bd_.executa(sql);
-        sql = "SELECT LAST_INSERT_ID()";
-        sql::ResultSet* res = bd_.consulta(sql);
-        if (res->next()) {
-            ret = res->getInt("LAST_INSERT_ID()");
+        string check_sql = "SELECT COUNT(*) FROM DataSala WHERE idSala = " + to_string(idSala) +
+            " AND dia = '" + dia + "' AND hora_inici = '" + hora_inici + "' AND hora_fi = '" + hora_fi + "'";
+        sql::ResultSet* res = bd_.consulta(check_sql);
+        if (res->next() && res->getInt(1) == 0) {
+            bd_.executa(sql);
+            sql = "SELECT LAST_INSERT_ID()";
+            sql::ResultSet* res = bd_.consulta(sql);
+            if (res->next()) {
+                ret = res->getInt("LAST_INSERT_ID()");
+            }
+        }
+        else {
+            cout << "Error: Duplicate entry detected!" << endl;
         }
     }
     catch (sql::SQLException& e) {

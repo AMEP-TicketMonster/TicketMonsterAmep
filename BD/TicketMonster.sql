@@ -36,7 +36,7 @@ CREATE TABLE `Assajos` (
   CONSTRAINT `Assajos_ibfk_1` FOREIGN KEY (`idGrup`) REFERENCES `GrupsMusicals` (`idGrup`) ON DELETE CASCADE,
   CONSTRAINT `Assajos_ibfk_2` FOREIGN KEY (`idSala`) REFERENCES `Sales` (`idSala`) ON DELETE CASCADE,
   CONSTRAINT `Assajos_ibfk_3` FOREIGN KEY (`idDataSala`) REFERENCES `DataSala` (`idDataSala`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,6 +45,7 @@ CREATE TABLE `Assajos` (
 
 LOCK TABLES `Assajos` WRITE;
 /*!40000 ALTER TABLE `Assajos` DISABLE KEYS */;
+INSERT INTO `Assajos` VALUES (2,2,4,7);
 /*!40000 ALTER TABLE `Assajos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -120,8 +121,11 @@ CREATE TABLE `DataSala` (
   `dia` date NOT NULL,
   `hora_inici` time NOT NULL,
   `hora_fi` time NOT NULL,
-  PRIMARY KEY (`idDataSala`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+  `idSala` int(11) NOT NULL,
+  PRIMARY KEY (`idDataSala`),
+  KEY `fk_idSala` (`idSala`),
+  CONSTRAINT `fk_idSala` FOREIGN KEY (`idSala`) REFERENCES `Sales` (`idSala`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -130,7 +134,7 @@ CREATE TABLE `DataSala` (
 
 LOCK TABLES `DataSala` WRITE;
 /*!40000 ALTER TABLE `DataSala` DISABLE KEYS */;
-INSERT INTO `DataSala` VALUES (1,'2025-05-15','16:00:00','21:00:00'),(2,'2025-05-15','16:00:00','21:00:00'),(3,'2025-05-15','16:00:00','21:00:00'),(4,'2025-05-15','16:00:00','21:00:00'),(5,'2025-05-15','16:00:00','21:00:00'),(6,'2025-05-15','16:00:00','21:00:00');
+INSERT INTO `DataSala` VALUES (7,'2025-05-15','16:00:00','21:00:00',4);
 /*!40000 ALTER TABLE `DataSala` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -153,7 +157,7 @@ CREATE TABLE `DisponibilitatSales` (
   CONSTRAINT `DisponibilitatSales_ibfk_1` FOREIGN KEY (`idSala`) REFERENCES `Sales` (`idSala`) ON DELETE CASCADE,
   CONSTRAINT `DisponibilitatSales_ibfk_2` FOREIGN KEY (`idDataSala`) REFERENCES `DataSala` (`idDataSala`) ON DELETE CASCADE,
   CONSTRAINT `DisponibilitatSales_ibfk_3` FOREIGN KEY (`idEstatSala`) REFERENCES `EstatSala` (`idEstatSala`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -162,7 +166,7 @@ CREATE TABLE `DisponibilitatSales` (
 
 LOCK TABLES `DisponibilitatSales` WRITE;
 /*!40000 ALTER TABLE `DisponibilitatSales` DISABLE KEYS */;
-INSERT INTO `DisponibilitatSales` VALUES (1,4,5,2),(2,4,6,2);
+INSERT INTO `DisponibilitatSales` VALUES (3,4,7,2);
 /*!40000 ALTER TABLE `DisponibilitatSales` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -438,4 +442,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-06 10:58:59
+-- Dump completed on 2025-04-06 20:24:57

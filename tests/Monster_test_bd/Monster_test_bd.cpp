@@ -28,19 +28,41 @@ void buscar_sala() {
         while (resposta != "S" && resposta != "N") {
             cin >> resposta;
         }
+        std::cin.ignore();
         if (resposta == "S") {
             // Afegir disponibilitat
             cout << "Afegim disponibilitat" << endl;
             DisponibilitatSala dispo;
             dispo.nom_sala = sala;
-            dispo.dia = "2025-05-15";
-            dispo.hora_inici = "16:00";
-            dispo.hora_fi = "21:00";
+
+            cout << "Entra el dia: " << endl;
+            getline(cin, dispo.dia);
+            cout << "Entra hora_inici: " << endl;
+            getline(cin, dispo.hora_inici);
+            cout << "Entra hora_fi: " << endl;
+            getline(cin, dispo.hora_fi);
+
+            //dispo.dia = "2025-05-15";
+            //dispo.hora_inici = "16:00";
+            //dispo.hora_fi = "21:00";
             dades.afegeix_disponibilitat_sala(dispo);
 
         } else {
             // No afegir disponibilitat
             cout << "Fem una reserva" << endl;
+            cout << "Entra el nom del grup musical: " << endl;
+            Assaig assaig;
+            getline(cin, assaig.nom_grup_musical);
+            cout << "Entra el nom de la sala: " << endl;
+            getline(cin, assaig.nom_sala);
+            cout << "Entra el dia: " << endl;
+            getline(cin, assaig.dia);
+            cout << "Entra hora_inici: " << endl;
+            getline(cin, assaig.hora_inici);
+            cout << "Entra hora_fi: " << endl;
+            getline(cin, assaig.hora_fi);
+            dades.afegeix_assaig(assaig);
+
         }
 
     }

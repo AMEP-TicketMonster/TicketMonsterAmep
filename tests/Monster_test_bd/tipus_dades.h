@@ -47,3 +47,11 @@ enum EstatSala {
     Disponible = 1,
     Reservada = 2
 };
+
+struct Assaig {
+    std::string nom_sala;
+    std::string nom_grup_musical;
+    std::string dia;
+    std::string hora_inici;
+    std::string hora_fi;
+};

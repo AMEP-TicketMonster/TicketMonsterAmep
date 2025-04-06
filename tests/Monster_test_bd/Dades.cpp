@@ -86,12 +86,59 @@ void Dades::esborra_usuari(const string& nom) {
     }
 }
 
+void Dades::afegeix_disponibilitat_sala(const DisponibilitatSala& dispo) {
+    // TODO: potser faltaria veure si aquesta disponibilitat ja existia (no overlap)
+    try {
+        int idSala = get_IDSala(dispo.nom_sala);
+        int idDataSala = afegeix_dataSala(idSala, dispo.dia, dispo.hora_inici, dispo.hora_fi);
+
+        string sql = "INSERT INTO DisponibilitatSales(idSala, idDataSala, idEstatSala)"
+            "VALUES (" + to_string(idSala) + ", " + to_string(idDataSala) + ", " + to_string(EstatSala::Disponible) + ")";
+        bd_.executa(sql);
+    }
+    catch (sql::SQLException& e) {
+        cerr << "SQL Error: " << e.what() << endl;
+    }
+}
+
+void Dades::afegeix_assaig(const Assaig& assaig) {
+    int idGrupMusical = get_IDGrupMusical(assaig.nom_grup_musical);
+    if (idGrupMusical != -1) {
+        cout << "id de " << assaig.nom_grup_musical << " es " << idGrupMusical << endl;
+        int idSala = get_IDSala(assaig.nom_sala);
+        if (idSala != -1) {
+            cout << "id de " << assaig.nom_sala << " es " << idSala << endl;
+            int idDataSala = get_IDDataSala(idSala, assaig.dia, assaig.hora_inici, assaig.hora_fi);
+            if (idDataSala != -1) {
+                cout << "id de DataSala es " << idDataSala << endl;
+                bool salaDisponible = estaSalaDisponible(idSala, idDataSala);
+                if (salaDisponible) {
+                    do_afegeix_assaig(idGrupMusical, idSala, idDataSala);
+                    cout << "despres afegeix assaig" << endl;
+                    modifica_disponibilitat(EstatSala::Reservada, idSala, idDataSala);
+                    cout << "despres modfica dispon" << endl;
+                }
+                cout << "estat sala " << to_string(salaDisponible);
+            }
+            else {
+                cout << "error idDataSala no existeix " << endl;
+            }
+        }
+        else {
+            cout << "error sala " << assaig.nom_sala << " no existeix " << endl;
+        }
+    }
+    else {
+        cout << "error grup musical " << assaig.nom_grup_musical << " no existeix " << endl;
+    }
+}
+
 // Post: aquesta funció retorna el ID del registre afegit a DataSala
-int Dades::afegeix_dataSala(const string& dia, const string& hora_inici, const string& hora_fi) {
+int Dades::afegeix_dataSala(int idSala, const string& dia, const string& hora_inici, const string& hora_fi) {
     int ret = -1;
     try {
-        string sql = "INSERT INTO DataSala(dia, hora_inici, hora_fi)"
-            "Values('" + dia + "', '" + hora_inici + "', '" + hora_fi + "')";
+        string sql = "INSERT INTO DataSala(idSala, dia, hora_inici, hora_fi)"
+            "Values(" + to_string(idSala) + ", '" + dia + "', '" + hora_inici + "', '" + hora_fi + "')";
         bd_.executa(sql);
         sql = "SELECT LAST_INSERT_ID()";
         sql::ResultSet* res = bd_.consulta(sql);
@@ -120,13 +167,69 @@ int Dades::get_IDSala(const string& nom) {
     return ret;
 }
 
-void Dades::afegeix_disponibilitat_sala(const DisponibilitatSala& dispo) {
-    // TODO: potser faltaria veure si aquesta disponibilitat ja existia (no overlap)
-    int idDataSala = afegeix_dataSala(dispo.dia, dispo.hora_inici, dispo.hora_fi);
+int Dades::get_IDGrupMusical(const std::string& nom_grup) {
+    int ret = -1;
     try {
-        int idSala = get_IDSala(dispo.nom_sala);
-        string sql = "INSERT INTO DisponibilitatSales(idSala, idDataSala, idEstatSala)"
-            "VALUES (" + to_string(idSala) + ", " + to_string(idDataSala) + ", " + to_string(EstatSala::Reservada) + ")";
+        string sql = "SELECT idGrup FROM GrupsMusicals WHERE nomGrup = '" + nom_grup + "'";
+        sql::ResultSet* res = bd_.consulta(sql);
+        if (res->next()) {
+            ret = res->getInt("idGrup");
+        }
+    }
+    catch (sql::SQLException& e) {
+        cerr << "SQL Error: " << e.what() << endl;
+    }
+    return ret;
+}
+
+int Dades::get_IDDataSala(const int idSala, const std::string& dia, const std::string& hora_inici, const std::string& hora_fi) {
+    int ret = -1;
+    try {
+        string sql = "SELECT idDataSala FROM DataSala WHERE idSala = " + to_string(idSala)
+                     + " AND dia = '" + dia + "' AND hora_inici = '" + hora_inici + "' AND hora_fi = '" + hora_fi + "'";
+        sql::ResultSet* res = bd_.consulta(sql);
+        if (res->next()) {
+            ret = res->getInt("idDataSala");
+        }
+    }
+    catch (sql::SQLException& e) {
+        cerr << "SQL Error: " << e.what() << endl;
+    }
+    return ret;
+}
+
+bool Dades::estaSalaDisponible(const int idSala, const int idDataSala) {
+    bool ret = false;
+    try {
+        string sql = "SELECT idEstatSala FROM DisponibilitatSales WHERE idSala = " + to_string(idSala)
+            + " AND idDataSala = " + to_string(idDataSala);
+        sql::ResultSet* res = bd_.consulta(sql);
+        if (res->next()) {
+            int estat = res->getInt("idEstatSala");
+            if (estat == EstatSala::Disponible) {
+                cout << "Disponible" << endl;
+                ret = true;
+            }
+            else {
+                cout << "No Disponible" << endl;
+            }
+        }
+        else
+            cout << "no res next" << endl;
+    }
+    catch (sql::SQLException& e) {
+        cerr << "SQL Error: " << e.what() << endl;
+    }
+    return ret;
+}
+
+
+void Dades::do_afegeix_assaig(const int idGrupMusical, const int idSala, const int idDataSala) {
+    try {
+        string sql = "INSERT INTO Assajos(idGrup, idSala, idDataSala) VALUES ("
+            + to_string(idGrupMusical)
+            + "," + to_string(idSala)
+            + "," + to_string(idDataSala) + ")";
         bd_.executa(sql);
     }
     catch (sql::SQLException& e) {
@@ -134,3 +237,13 @@ void Dades::afegeix_disponibilitat_sala(const DisponibilitatSala& dispo) {
     }
 }
 
+void Dades::modifica_disponibilitat(const EstatSala estat, const int idSala, const int idDataSala) {
+    try {
+        string sql = "UPDATE DisponibilitatSales SET idEstatSala = " + to_string(estat)
+            + " WHERE idSala = " + to_string(idSala) + " AND idDataSala = " + to_string(idDataSala);
+        bd_.executa(sql);
+    }
+    catch (sql::SQLException& e) {
+        cerr << "SQL Error: " << e.what() << endl;
+    }
+}

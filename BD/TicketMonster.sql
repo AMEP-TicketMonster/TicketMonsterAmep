@@ -123,7 +123,7 @@ CREATE TABLE `DataSala` (
   `hora_fi` time NOT NULL,
   `idSala` int(11) NOT NULL,
   PRIMARY KEY (`idDataSala`),
-  KEY `fk_idSala` (`idSala`),
+  UNIQUE KEY `unique_schedule` (`idSala`,`dia`,`hora_inici`,`hora_fi`),
   CONSTRAINT `fk_idSala` FOREIGN KEY (`idSala`) REFERENCES `Sales` (`idSala`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -442,4 +442,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-06 20:24:57
+-- Dump completed on 2025-04-06 21:18:41

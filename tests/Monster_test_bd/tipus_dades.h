@@ -35,3 +35,15 @@ struct Sala {
         return !(*this == other);
     }
 };
+
+struct DisponibilitatSala {
+    std::string nom_sala;
+    std::string dia;
+    std::string hora_inici;
+    std::string hora_fi;
+};
+
+enum EstatSala {
+    Disponible = 1,
+    Reservada = 2
+};

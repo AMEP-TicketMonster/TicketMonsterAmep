@@ -18,6 +18,31 @@ void buscar_sala() {
             cout << "Sala " << i + 1 << endl;
             cout << sales[i].nom << " " << sales[i].ciutat << " " << sales[i].capacitat << endl;
         }
+
+        cout << "Entra sala: ";
+        string sala;
+        getline(cin, sala);
+        cout << "Vols afegir disponibilitat (S/N): ";
+        string resposta;
+        cin >> resposta;
+        while (resposta != "S" && resposta != "N") {
+            cin >> resposta;
+        }
+        if (resposta == "S") {
+            // Afegir disponibilitat
+            cout << "Afegim disponibilitat" << endl;
+            DisponibilitatSala dispo;
+            dispo.nom_sala = sala;
+            dispo.dia = "2025-05-15";
+            dispo.hora_inici = "16:00";
+            dispo.hora_fi = "21:00";
+            dades.afegeix_disponibilitat_sala(dispo);
+
+        } else {
+            // No afegir disponibilitat
+            cout << "Fem una reserva" << endl;
+        }
+
     }
     else {
         cout << "No s'han trobat sales a aquesta ciutat" << endl;
@@ -59,59 +84,5 @@ int main()
         
     }
 
-#if 0
-
-    std::cout << "Hola!\n";
-
-    Usuari usuari;
-    //usuari.nom = "Sandra";
-    //usuari.cognom = "Perez";
-    //usuari.correu_electronic = "san@gmail.com";
-    //usuari.contrasenya = "san_pwd";
-
-    Dades dades;
-    //dades.crea_usuari(usuari);
-
-
-    dades.get_usuari("Sandra", usuari);
-
-    cout << usuari.nom << endl;
-    cout << usuari.cognom << endl;
-    cout << usuari.email << endl;
-    cout << usuari.contrasenya << endl;
-
-
-    dades.esborra_usuari("Sandra");
-
-#endif
-
-/*
-    ConnexioBD bd;
-
-    bool ret = false;
-    string sql = "SELECT * FROM Usuaris";
-    // Fem format de data_naixement per tenir (DD/MM/AAAA) 
-    // la keyword "BINARY" al WHERE de la SELECT fa que la cerca sigui sensible a majúscules
-    sql::ResultSet* res = bd.consulta(sql);
-    while (res->next()) {
-        cout << "el nom es " << res->getString("nom") << endl;
-        cout << "el cognnom es " << res->getString("cognom") << endl;
-        cout << "el email es " << res->getString("email") << endl;
-        ret = true;
-    }
-    delete res;
-    */
-
-    std::cout << "Hello World!\n";
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

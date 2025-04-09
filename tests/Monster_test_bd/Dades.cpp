@@ -87,7 +87,6 @@ void Dades::esborra_usuari(const string& nom) {
 }
 
 void Dades::afegeix_disponibilitat_sala(const DisponibilitatSala& dispo) {
-    // TODO: potser faltaria veure si aquesta disponibilitat ja existia (no overlap)
     try {
         int idSala = get_IDSala(dispo.nom_sala);
         int idDataSala = afegeix_dataSala(idSala, dispo.dia, dispo.hora_inici, dispo.hora_fi);
@@ -104,21 +103,15 @@ void Dades::afegeix_disponibilitat_sala(const DisponibilitatSala& dispo) {
 void Dades::afegeix_assaig(const Assaig& assaig) {
     int idGrupMusical = get_IDGrupMusical(assaig.nom_grup_musical);
     if (idGrupMusical != -1) {
-        cout << "id de " << assaig.nom_grup_musical << " es " << idGrupMusical << endl;
         int idSala = get_IDSala(assaig.nom_sala);
         if (idSala != -1) {
-            cout << "id de " << assaig.nom_sala << " es " << idSala << endl;
             int idDataSala = get_IDDataSala(idSala, assaig.dia, assaig.hora_inici, assaig.hora_fi);
             if (idDataSala != -1) {
-                cout << "id de DataSala es " << idDataSala << endl;
                 bool salaDisponible = estaSalaDisponible(idSala, idDataSala);
                 if (salaDisponible) {
                     do_afegeix_assaig(idGrupMusical, idSala, idDataSala);
-                    cout << "despres afegeix assaig" << endl;
                     modifica_disponibilitat(EstatSala::Reservada, idSala, idDataSala);
-                    cout << "despres modfica dispon" << endl;
                 }
-                cout << "estat sala " << to_string(salaDisponible);
             }
             else {
                 cout << "error idDataSala no existeix " << endl;
@@ -176,6 +169,21 @@ int Dades::get_IDSala(const string& nom) {
     return ret;
 }
 
+std::string Dades::get_NomSala(const int id_sala) {
+    string ret;
+    try {
+        string sql = "SELECT nom FROM Sales WHERE idSala = " + to_string(id_sala);
+        sql::ResultSet* res = bd_.consulta(sql);
+        if (res->next()) {
+            ret = res->getString("nom");
+        }
+    }
+    catch (sql::SQLException& e) {
+        cerr << "SQL Error: " << e.what() << endl;
+    }
+    return ret;
+}
+
 int Dades::get_IDGrupMusical(const std::string& nom_grup) {
     int ret = -1;
     try {
@@ -190,6 +198,23 @@ int Dades::get_IDGrupMusical(const std::string& nom_grup) {
     }
     return ret;
 }
+
+std::string Dades::get_NomGrupMusical(const int id_grup_musical) {
+    string ret;
+    try {
+        string sql = "SELECT nomGrup FROM GrupsMusicals WHERE idGrup = " + to_string(id_grup_musical);
+        sql::ResultSet* res = bd_.consulta(sql);
+        if (res->next()) {
+            ret = res->getString("nomGrup");
+        }
+    }
+    catch (sql::SQLException& e) {
+        cerr << "SQL Error: " << e.what() << endl;
+    }
+    return ret;
+}
+
+
 
 int Dades::get_IDDataSala(const int idSala, const std::string& dia, const std::string& hora_inici, const std::string& hora_fi) {
     int ret = -1;
@@ -223,8 +248,6 @@ bool Dades::estaSalaDisponible(const int idSala, const int idDataSala) {
                 cout << "No Disponible" << endl;
             }
         }
-        else
-            cout << "no res next" << endl;
     }
     catch (sql::SQLException& e) {
         cerr << "SQL Error: " << e.what() << endl;
@@ -256,3 +279,118 @@ void Dades::modifica_disponibilitat(const EstatSala estat, const int idSala, con
         cerr << "SQL Error: " << e.what() << endl;
     }
 }
+
+void Dades::get_assajos(vector<Assaig> &assajos) {
+    try {
+        bool ret = false;
+        string sql = "SELECT * FROM Assajos";
+        sql::ResultSet* res = bd_.consulta(sql);
+        if (!res) {
+            cout << "Error a l'executar query" << endl;
+        }
+        else {
+            while (res->next()) {
+                Sala sala;
+                int idGrup = res->getInt("idGrup");
+                int idSala = res->getInt("idSala");
+                int idDataSala = res->getInt("idDataSala");
+                Assaig assaig;
+                omple_dia_i_hores_data_sala(idDataSala, assaig.dia, assaig.hora_inici, assaig.hora_fi);
+                assaig.nom_grup_musical = get_NomGrupMusical(idGrup);
+                assaig.nom_sala = get_NomSala(idSala);
+                assajos.push_back(assaig);
+                ret = true;
+            }
+        }
+        delete res;
+    }
+    catch (sql::SQLException& e) {
+        cerr << "SQL Error: " << e.what() << endl;
+    }
+}
+
+void Dades::omple_dia_i_hores_data_sala(const int idDataSala, std::string& dia, std::string& hora_inici, std::string& hora_fi) {
+    try {
+        string sql = "SELECT dia, hora_inici, hora_fi FROM DataSala WHERE idDataSala = " + to_string(idDataSala);
+        sql::ResultSet* res = bd_.consulta(sql);
+        if (res->next()) {
+            dia = res->getString("dia");
+            hora_inici = res->getString("hora_inici");
+            hora_fi = res->getString("hora_fi");
+        }
+    }
+    catch (sql::SQLException& e) {
+        cerr << "SQL Error: " << e.what() << endl;
+    }
+
+}
+
+void Dades::compra_entrades_assaig(const Assaig& assaig, int numero_entrades) {
+    Id_Entrades_Assaig info = get_ID_i_entrades_Assaig(assaig);
+    if (numero_entrades > info.entrades_disponibles) {
+        cout << "Ho sento no queden suficients entrades" << endl;
+    }
+    else {
+        cout << "Tenim suficients entrades" << endl;
+        info.entrades_disponibles -= numero_entrades;
+        actualitza_entrades_disponibles_assaig(info.idAssaig, info.entrades_disponibles);
+        try {
+            string values;
+            // TODO: ojo preu i idUsuari està hardcoded
+            // idEstatEntrada 5 és Comprada
+            for (int i = 0; i < numero_entrades; i++) {
+                values += "(1," + to_string(info.idAssaig) + ", 30, 5)";
+                if (i < numero_entrades - 1)
+                    values += ",";
+            }
+            string sql = "INSERT INTO EntradesAssaig (idUsuari, idAssaig, preu, idEstatEntrada) VALUES "
+                + values;
+            bd_.executa(sql);
+        }
+        catch (sql::SQLException& e) {
+            cerr << "SQL Error: " << e.what() << endl;
+        }
+    }
+}
+
+Id_Entrades_Assaig Dades::get_ID_i_entrades_Assaig(const Assaig& assaig) {
+    Id_Entrades_Assaig ret = { -1,0 };
+    try {
+        int idGrupMusical = get_IDGrupMusical(assaig.nom_grup_musical);
+        if (idGrupMusical != -1) {
+            cout << "id de " << assaig.nom_grup_musical << " es " << idGrupMusical << endl;
+            int idSala = get_IDSala(assaig.nom_sala);
+            if (idSala != -1) {
+                cout << "id de " << assaig.nom_sala << " es " << idSala << endl;
+                int idDataSala = get_IDDataSala(idSala, assaig.dia, assaig.hora_inici, assaig.hora_fi);
+                if (idDataSala != -1) {
+                    string sql = "SELECT idAssajos, entrades_disponibles FROM Assajos WHERE idSala = " + to_string(idSala)
+                        + " AND idGrup = " + to_string(idGrupMusical) + " AND idDataSala = " + to_string(idDataSala);
+                    sql::ResultSet* res = bd_.consulta(sql);
+                    if (res->next()) {
+                        ret.idAssaig = res->getInt("idAssajos");
+                        ret.entrades_disponibles = res->getInt("entrades_disponibles");
+                    }
+                }
+            }
+        }
+    }
+    catch (sql::SQLException& e) {
+        cerr << "SQL Error: " << e.what() << endl;
+    }
+    return ret;
+}
+
+
+void Dades::actualitza_entrades_disponibles_assaig(const int assaig_id, const int entrades_disponibles) {
+    try {
+        string sql = "UPDATE Assajos SET entrades_disponibles = " + to_string(entrades_disponibles)
+            + " WHERE idAssajos = " + to_string(assaig_id);
+        bd_.executa(sql);
+    }
+    catch (sql::SQLException& e) {
+        cerr << "SQL Error: " << e.what() << endl;
+    }
+}
+
+

@@ -55,3 +55,9 @@ struct Assaig {
     std::string hora_inici;
     std::string hora_fi;
 };
+
+struct Id_Entrades_Assaig {
+    int idAssaig;
+    int entrades_disponibles;
+};
+

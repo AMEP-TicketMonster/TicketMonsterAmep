@@ -29,6 +29,7 @@ CREATE TABLE `Assajos` (
   `idGrup` int(11) NOT NULL,
   `idSala` int(11) NOT NULL,
   `idDataSala` int(11) NOT NULL,
+  `entrades_disponibles` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`idAssajos`),
   KEY `idGrup` (`idGrup`),
   KEY `idSala` (`idSala`),
@@ -45,7 +46,7 @@ CREATE TABLE `Assajos` (
 
 LOCK TABLES `Assajos` WRITE;
 /*!40000 ALTER TABLE `Assajos` DISABLE KEYS */;
-INSERT INTO `Assajos` VALUES (2,2,4,7);
+INSERT INTO `Assajos` VALUES (2,2,4,7,173);
 /*!40000 ALTER TABLE `Assajos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -96,7 +97,7 @@ CREATE TABLE `Concerts` (
   KEY `fk_concerts_generes` (`idGenere`),
   CONSTRAINT `Concerts_ibfk_1` FOREIGN KEY (`idUsuariOrganitzador`) REFERENCES `Usuaris` (`idUsuari`) ON DELETE SET NULL,
   CONSTRAINT `fk_concerts_generes` FOREIGN KEY (`idGenere`) REFERENCES `Generes` (`idGenere`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -105,7 +106,7 @@ CREATE TABLE `Concerts` (
 
 LOCK TABLES `Concerts` WRITE;
 /*!40000 ALTER TABLE `Concerts` DISABLE KEYS */;
-INSERT INTO `Concerts` VALUES (1,'Monster_1','2024-06-05',1000,60.00,1,1,'Barcelona'),(2,'Monster_2','2024-04-05',2000,70.00,2,2,'Madrid'),(3,'Monster_3','2023-04-05',2500,80.00,3,3,'Bilbao');
+INSERT INTO `Concerts` VALUES (1,'Monster_1','2024-06-05',1000,60.00,1,1,'Barcelona'),(2,'Monster_2','2024-04-05',2000,70.00,2,2,'Madrid'),(3,'Monster_3','2023-04-05',2500,80.00,NULL,3,'Bilbao'),(4,'Guns and Roses','2025-12-12',3000,200.00,1,4,'Barcelona'),(5,'Radiohead','2026-01-02',1000,10000.00,1,1,'UK');
 /*!40000 ALTER TABLE `Concerts` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -125,7 +126,7 @@ CREATE TABLE `DataSala` (
   PRIMARY KEY (`idDataSala`),
   UNIQUE KEY `unique_schedule` (`idSala`,`dia`,`hora_inici`,`hora_fi`),
   CONSTRAINT `fk_idSala` FOREIGN KEY (`idSala`) REFERENCES `Sales` (`idSala`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -134,7 +135,7 @@ CREATE TABLE `DataSala` (
 
 LOCK TABLES `DataSala` WRITE;
 /*!40000 ALTER TABLE `DataSala` DISABLE KEYS */;
-INSERT INTO `DataSala` VALUES (7,'2025-05-15','16:00:00','21:00:00',4);
+INSERT INTO `DataSala` VALUES (8,'2015-05-06','12:00:00','14:00:00',4),(7,'2025-05-15','16:00:00','21:00:00',4);
 /*!40000 ALTER TABLE `DataSala` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -157,7 +158,7 @@ CREATE TABLE `DisponibilitatSales` (
   CONSTRAINT `DisponibilitatSales_ibfk_1` FOREIGN KEY (`idSala`) REFERENCES `Sales` (`idSala`) ON DELETE CASCADE,
   CONSTRAINT `DisponibilitatSales_ibfk_2` FOREIGN KEY (`idDataSala`) REFERENCES `DataSala` (`idDataSala`) ON DELETE CASCADE,
   CONSTRAINT `DisponibilitatSales_ibfk_3` FOREIGN KEY (`idEstatSala`) REFERENCES `EstatSala` (`idEstatSala`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -166,38 +167,97 @@ CREATE TABLE `DisponibilitatSales` (
 
 LOCK TABLES `DisponibilitatSales` WRITE;
 /*!40000 ALTER TABLE `DisponibilitatSales` DISABLE KEYS */;
-INSERT INTO `DisponibilitatSales` VALUES (3,4,7,2);
+INSERT INTO `DisponibilitatSales` VALUES (3,4,7,2),(5,4,8,1);
 /*!40000 ALTER TABLE `DisponibilitatSales` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Entrades`
+-- Table structure for table `EntradesAssaig`
 --
 
-DROP TABLE IF EXISTS `Entrades`;
+DROP TABLE IF EXISTS `EntradesAssaig`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Entrades` (
+CREATE TABLE `EntradesAssaig` (
   `idEntrada` int(11) NOT NULL AUTO_INCREMENT,
-  `idUsuariClient` int(11) DEFAULT NULL,
-  `idConcert` int(11) DEFAULT NULL,
+  `idUsuari` int(11) DEFAULT NULL,
+  `idAssaig` int(11) NOT NULL,
   `preu` decimal(10,2) DEFAULT NULL,
-  `estat` enum('Disponible','Reservada','Comprada','Cancelada') DEFAULT NULL,
+  `idEstatEntrada` int(11) NOT NULL,
   PRIMARY KEY (`idEntrada`),
-  KEY `idUsuariClient` (`idUsuariClient`),
-  KEY `idConcert` (`idConcert`),
-  CONSTRAINT `Entrades_ibfk_1` FOREIGN KEY (`idUsuariClient`) REFERENCES `Usuaris` (`idUsuari`) ON DELETE CASCADE,
-  CONSTRAINT `Entrades_ibfk_2` FOREIGN KEY (`idConcert`) REFERENCES `Concerts` (`idConcert`) ON DELETE CASCADE
+  KEY `idUsuariClient` (`idUsuari`),
+  KEY `EntradesAssaig_ibfk_2` (`idEstatEntrada`),
+  KEY `EntradesAssaig_ibfk_3` (`idAssaig`),
+  CONSTRAINT `EntradesAssaig_ibfk_1` FOREIGN KEY (`idUsuari`) REFERENCES `Usuaris` (`idUsuari`) ON DELETE CASCADE,
+  CONSTRAINT `EntradesAssaig_ibfk_2` FOREIGN KEY (`idEstatEntrada`) REFERENCES `EstatEntrada` (`idEstatEntrada`) ON DELETE CASCADE,
+  CONSTRAINT `EntradesAssaig_ibfk_3` FOREIGN KEY (`idAssaig`) REFERENCES `Assajos` (`idAssajos`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=188 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `EntradesAssaig`
+--
+
+LOCK TABLES `EntradesAssaig` WRITE;
+/*!40000 ALTER TABLE `EntradesAssaig` DISABLE KEYS */;
+INSERT INTO `EntradesAssaig` VALUES (181,1,2,30.00,5),(182,1,2,30.00,5),(183,1,2,30.00,5),(184,1,2,30.00,5),(185,1,2,30.00,5),(186,1,2,30.00,5),(187,1,2,30.00,5);
+/*!40000 ALTER TABLE `EntradesAssaig` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `EntradesConcert`
+--
+
+DROP TABLE IF EXISTS `EntradesConcert`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `EntradesConcert` (
+  `idEntrada` int(11) NOT NULL AUTO_INCREMENT,
+  `idUsuari` int(11) DEFAULT NULL,
+  `idConcert` int(11) NOT NULL,
+  `preu` decimal(10,2) DEFAULT NULL,
+  `idEstatEntrada` int(11) NOT NULL,
+  PRIMARY KEY (`idEntrada`),
+  KEY `idUsuariClient` (`idUsuari`),
+  KEY `EntradesConcert_ibfk_2` (`idEstatEntrada`),
+  KEY `EntradesConcert_ibfk_3` (`idConcert`),
+  CONSTRAINT `EntradesConcert_ibfk_1` FOREIGN KEY (`idUsuari`) REFERENCES `Usuaris` (`idUsuari`) ON DELETE CASCADE,
+  CONSTRAINT `EntradesConcert_ibfk_2` FOREIGN KEY (`idEstatEntrada`) REFERENCES `EstatEntrada` (`idEstatEntrada`) ON DELETE CASCADE,
+  CONSTRAINT `EntradesConcert_ibfk_3` FOREIGN KEY (`idConcert`) REFERENCES `Concerts` (`idConcert`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Entrades`
+-- Dumping data for table `EntradesConcert`
 --
 
-LOCK TABLES `Entrades` WRITE;
-/*!40000 ALTER TABLE `Entrades` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Entrades` ENABLE KEYS */;
+LOCK TABLES `EntradesConcert` WRITE;
+/*!40000 ALTER TABLE `EntradesConcert` DISABLE KEYS */;
+/*!40000 ALTER TABLE `EntradesConcert` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `EstatEntrada`
+--
+
+DROP TABLE IF EXISTS `EstatEntrada`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `EstatEntrada` (
+  `idEstatEntrada` int(11) NOT NULL AUTO_INCREMENT,
+  `estat` enum('Disponible','Reservada','Comprada','Cancelada') NOT NULL,
+  PRIMARY KEY (`idEstatEntrada`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `EstatEntrada`
+--
+
+LOCK TABLES `EstatEntrada` WRITE;
+/*!40000 ALTER TABLE `EstatEntrada` DISABLE KEYS */;
+INSERT INTO `EstatEntrada` VALUES (3,'Disponible'),(4,'Reservada'),(5,'Comprada'),(6,'Cancelada');
+/*!40000 ALTER TABLE `EstatEntrada` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -389,7 +449,7 @@ CREATE TABLE `Usuaris` (
   `contrasenya` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`idUsuari`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -398,7 +458,7 @@ CREATE TABLE `Usuaris` (
 
 LOCK TABLES `Usuaris` WRITE;
 /*!40000 ALTER TABLE `Usuaris` DISABLE KEYS */;
-INSERT INTO `Usuaris` VALUES (1,'Eric','Costa','ec@email.com','eric_password'),(2,'Wei','Zhou','wei@email.com','wei_password'),(3,'Rubén','Gómez','ruben@email.com','ruben_password');
+INSERT INTO `Usuaris` VALUES (1,'Eric','Costa','ec@email.com','eric_password'),(2,'Wei','Zhou','wei@email.com','wei_password'),(7,'ruben123','ruawdjawjkd','hola@mail.com','12345'),(8,'ruben','gomez','ruben@mail.com','ruben'),(9,'Misco','Jones','test@test.com','test123');
 /*!40000 ALTER TABLE `Usuaris` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -442,4 +502,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-04-06 21:18:41
+-- Dump completed on 2025-04-09 20:25:30

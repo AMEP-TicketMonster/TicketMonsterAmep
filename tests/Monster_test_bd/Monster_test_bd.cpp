@@ -56,10 +56,6 @@ void reservar_sala() {
             cout << "Sala " << i + 1 << endl;
             cout << sales[i].nom << " " << sales[i].ciutat << " " << sales[i].capacitat << endl;
         }
-
-        cout << "Entra sala: ";
-        string sala;
-        getline(cin, sala);
             
         cout << "Entra el nom del grup musical: " << endl;
         Assaig assaig;
@@ -72,6 +68,9 @@ void reservar_sala() {
         getline(cin, assaig.hora_inici);
         cout << "Entra hora_fi: " << endl;
         getline(cin, assaig.hora_fi);
+        cout << "Entra preu entrada public: " << endl;
+        cin >> assaig.preu_entrada_public;
+        cin.ignore(1000, '\n');
         dades.afegeix_assaig(assaig);
     }
     else {

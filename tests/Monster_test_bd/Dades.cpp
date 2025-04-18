@@ -109,7 +109,7 @@ void Dades::afegeix_assaig(const Assaig& assaig) {
             if (idDataSala != -1) {
                 bool salaDisponible = estaSalaDisponible(idSala, idDataSala);
                 if (salaDisponible) {
-                    do_afegeix_assaig(idGrupMusical, idSala, idDataSala);
+                    do_afegeix_assaig(idGrupMusical, idSala, idDataSala, assaig.preu_entrada_public);
                     modifica_disponibilitat(EstatSala::Reservada, idSala, idDataSala);
                 }
             }
@@ -256,12 +256,14 @@ bool Dades::estaSalaDisponible(const int idSala, const int idDataSala) {
 }
 
 
-void Dades::do_afegeix_assaig(const int idGrupMusical, const int idSala, const int idDataSala) {
+void Dades::do_afegeix_assaig(const int idGrupMusical, const int idSala, const int idDataSala, double preu_entrada_public) {
     try {
-        string sql = "INSERT INTO Assajos(idGrup, idSala, idDataSala) VALUES ("
+        string sql = "INSERT INTO Assajos(idGrup, idSala, idDataSala, preu_entrada_public) VALUES ("
             + to_string(idGrupMusical)
             + "," + to_string(idSala)
-            + "," + to_string(idDataSala) + ")";
+            + "," + to_string(idDataSala) 
+            + "," + to_string(preu_entrada_public)
+            + ")";
         bd_.executa(sql);
     }
     catch (sql::SQLException& e) {
@@ -295,6 +297,7 @@ void Dades::get_assajos(vector<Assaig> &assajos) {
                 int idSala = res->getInt("idSala");
                 int idDataSala = res->getInt("idDataSala");
                 Assaig assaig;
+                assaig.preu_entrada_public = res->getDouble("preu_entrada_public");
                 omple_dia_i_hores_data_sala(idDataSala, assaig.dia, assaig.hora_inici, assaig.hora_fi);
                 assaig.nom_grup_musical = get_NomGrupMusical(idGrup);
                 assaig.nom_sala = get_NomSala(idSala);
@@ -336,10 +339,10 @@ void Dades::compra_entrades_assaig(const Assaig& assaig, int numero_entrades) {
         actualitza_entrades_disponibles_assaig(info.idAssaig, info.entrades_disponibles);
         try {
             string values;
-            // TODO: ojo preu i idUsuari està hardcoded
+            // TODO: ojo idUsuari està hardcoded a 1
             // idEstatEntrada 5 és Comprada
             for (int i = 0; i < numero_entrades; i++) {
-                values += "(1," + to_string(info.idAssaig) + ", 30, 5)";
+                values += "(1," + to_string(info.idAssaig) + ", 30, " + to_string(assaig.preu_entrada_public) + ")";
                 if (i < numero_entrades - 1)
                     values += ",";
             }

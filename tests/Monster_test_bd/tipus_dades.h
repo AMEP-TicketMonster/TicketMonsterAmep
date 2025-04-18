@@ -54,6 +54,7 @@ struct Assaig {
     std::string dia;
     std::string hora_inici;
     std::string hora_fi;
+    double preu_entrada_public;
 };
 
 struct Id_Entrades_Assaig {
